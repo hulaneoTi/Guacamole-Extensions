@@ -1,0 +1,84 @@
+version: '3'
+networks:
+  guacnetwork_compose:
+    driver: bridge
+services:
+  # GUACAMOLE
+  guacamole:
+    container_name: guacamole
+    image: 'guacamole/guacamole:latest'
+    depends_on:
+      - guacd
+      - mysql
+    environment:
+      - GUACD_HOSTNAME=guacd
+      - MYSQL_HOSTNAME=mysql
+      - MYSQL_DATABASE=guacamole_db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root_password
+      - MYSQL_PORT=3306
+    volumes:
+      - ./guacamole:/home/guacamole
+      - ./extension:/opt/guacamole/extension/
+      - ./scripts:/opt/guacamole/bin
+    links:
+      - guacd
+    ports:
+      - 8080:8080
+    networks:
+      guacnetwork_compose:
+
+  # GUACD
+  guacd:
+    container_name: guacamole-guacd
+    image: 'guacamole/guacd:latest'
+    restart: always
+    volumes:
+      - ./drive:/drive:rw
+      - ./record:/record:rw
+    networks:
+      guacnetwork_compose:
+
+  # GUACENC
+  guacenc:
+    container_name: guacamole-guacenc
+    image: bytepen/guacenc:latest
+    restart: always
+    environment:
+      - AUTOCONVERT=true
+    volumes_from:
+      - guacd:rw
+    networks:
+      guacnetwork_compose:
+
+  # MYSQL
+  mysql:
+    container_name: guacamole-mysql
+    image: 'mysql'
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=guacamole_db
+      - MYSQL_USER=guacamole_user
+      - MYSQL_PASSWORD=guacamole_password
+    volumes:
+      - './data:/var/lib/mysql'
+      - './init:/docker-entrypoint-initdb.d'
+    networks:
+      guacnetwork_compose:
+
+  # NGINX
+  nginx:
+    container_name: guacamole-nginx
+    restart: always
+    image: nginx
+    volumes:
+      - './nginx/templates:/etc/nginx/templates:ro'
+      - './nginx/ssl/self.cert:/etc/nginx/ssl/self.cert:ro'
+      - './nginx/ssl/self-ssl.key:/etc/nginx/ssl/self-ssl.key:ro'
+    ports:
+      - '8443:443'
+    links:
+      - guacamole
+    networks:
+      guacnetwork_compose:

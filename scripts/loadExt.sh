@@ -1,24 +1,22 @@
 #!/bin/bash
 
-# Diretório de origem
-diretorio="/opt/guacamole/extension"
+# Source directory
+srcdir="/opt/guacamole/extension"
 
-# Percorre todos os arquivos no diretório
-for arquivo in "$diretorio"/*; do
-    if [ -d "$arquivo" ]; then
-        # Se for um diretório, compacta usando o comando zip
-        nome_arquivo="$(basename "$arquivo")"
-		jar cf "$diretorio/$nome_arquivo.jar" -C "$arquivo" .
+# Scroll through all the files in the directory
+for file in "$srcdir"/*; do
+    if [ -d "$file" ]; then
+        # If it's a directory, compress it using the jar command
+        fileName="$(basename "$file")"
+		jar cf "$srcdir/$fileName.jar" -C "$file" .
     fi
 done
 
-# Cria links simbólicos para todos os arquivos .jar
-for arquivo in "$diretorio"/*.jar; do
-    if [ -f "$arquivo" ]; then
-        # Se for um arquivo .jar, cria o link simbólico
-        nome_link="$(basename "$arquivo").link"
-        ln -s "$arquivo" "$1"
+# Create symbolic links to all .jar files
+for file in "$srcdir"/*.jar; do
+    if [ -f "$file" ]; then
+        # If it is a .jar file, creates the symbolic link
+        linkName="$(basename "$file").link"
+        ln -s "$file" "$1"
     fi
 done
-
-#ln -s /opt/guacamole/extension/tisafe.jar "$1"

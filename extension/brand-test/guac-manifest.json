@@ -1,0 +1,18 @@
+{
+   "guacamoleVersion":"*",
+   "name":"<Extension Name Here>",
+   "namespace":"extension_name",
+   "smallIcon" : "web/images/browser-icon.png",
+   "largeIcon"	: "web/images/browser-icon.png.png",
+   "translations":[
+      "translations/en.json"
+   ],
+   "css":[
+      "web/custom.css"
+   ],
+   "resources":{
+      "web/images/brand-logo.png":"image/png",
+      "web/images/browser-icon.png":"image/png",
+	  "web/images/background.jpg":"image/png",
+   }
+}
